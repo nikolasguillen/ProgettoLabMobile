@@ -1,8 +1,11 @@
 package com.example.progetto;
 
 import android.app.Activity;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
@@ -11,6 +14,7 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,6 +25,13 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelStoreOwner;
 
 import com.example.progetto.ViewModel.AddViewModel;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import static com.example.progetto.Utilities.REQUEST_IMAGE_CAPTURE;
 
@@ -59,6 +70,21 @@ public class AddFragment extends Fragment {
                     imageView.setImageBitmap(bitmap);
                 }
             });
+
+            view.findViewById(R.id.fab_add).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Bitmap bitmap = addViewModel.getBitmap().getValue();
+                    if(bitmap != null) {
+                        try {
+                            saveImage(bitmap, activity);
+                            Toast.makeText(activity, "Image Saved", Toast.LENGTH_SHORT).show();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            });
         }
     }
 
@@ -72,5 +98,22 @@ public class AddFragment extends Fragment {
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         menu.findItem(R.id.app_bar_search).setVisible(false);
+    }
+
+    private void saveImage(Bitmap bitmap, Activity activity) throws IOException {
+        String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.ITALY).format(new Date());
+        String name = "JPEG_" + timestamp + "_.jpeg";
+
+        ContentResolver resolver = activity.getContentResolver();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, name);
+        contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg");
+        Uri imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
+
+        OutputStream outputStream = resolver.openOutputStream(imageUri);
+
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+
+        outputStream.close();
     }
 }

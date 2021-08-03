@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.progetto.CardItem;
 import com.example.progetto.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CardAdapter extends RecyclerView.Adapter<CardViewHolder> {
@@ -22,8 +23,7 @@ public class CardAdapter extends RecyclerView.Adapter<CardViewHolder> {
     private Activity activity;
     private OnItemListener listener;
 
-    public CardAdapter(List<CardItem> cardItemList, Activity activity, OnItemListener listener) {
-        this.cardItemList = cardItemList;
+    public CardAdapter(Activity activity, OnItemListener listener) {
         this.activity = activity;
         this.listener = listener;
     }
@@ -39,18 +39,23 @@ public class CardAdapter extends RecyclerView.Adapter<CardViewHolder> {
     public void onBindViewHolder(@NonNull CardViewHolder holder, int position) {
         CardItem currentCardItem = cardItemList.get(position);
 
-        holder.placeTextView.setText(currentCardItem.getPlace());
-        holder.dateTextView.setText(currentCardItem.getDate());
-
         String image_path = currentCardItem.getImageResource();
         if(image_path.contains("ic_")) {
-            Drawable drawable = ContextCompat.getDrawable(activity, activity.getResources().getIdentifier(image_path, "drawable", activity.getPackageName()));
+            Drawable drawable = ContextCompat.getDrawable(activity, activity.getResources()
+                    .getIdentifier(image_path, "drawable",
+                            activity.getPackageName()));
             holder.imageCardView.setImageDrawable(drawable);
         }
+
+        holder.placeTextView.setText(currentCardItem.getPlace());
+        holder.dateTextView.setText(currentCardItem.getDate());
     }
 
     @Override
-    public int getItemCount() {
-        return cardItemList.size();
+    public int getItemCount() { return cardItemList.size(); }
+
+    public void setData(List<CardItem> list) {
+        this.cardItemList = new ArrayList<>(list);
+        notifyDataSetChanged();
     }
 }

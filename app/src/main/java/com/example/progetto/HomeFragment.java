@@ -13,10 +13,15 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelStoreOwner;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.progetto.RecyclerView.CardAdapter;
 import com.example.progetto.RecyclerView.OnItemListener;
+import com.example.progetto.ViewModel.ListViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
@@ -26,6 +31,8 @@ public class HomeFragment extends Fragment implements OnItemListener {
 
     private RecyclerView recyclerView;
     private CardAdapter cardAdapter;
+
+    private ListViewModel listViewModel;
 
     @Nullable
     @Override
@@ -43,6 +50,14 @@ public class HomeFragment extends Fragment implements OnItemListener {
 
             setRecyclerView(activity);
 
+            listViewModel = new ViewModelProvider((ViewModelStoreOwner) activity).get(ListViewModel.class);
+            listViewModel.getCardItems().observe((LifecycleOwner) activity, new Observer<List<CardItem>>() {
+                @Override
+                public void onChanged(List<CardItem> cardItems) {
+                    cardAdapter.setData(cardItems);
+                }
+            });
+
             FloatingActionButton floatingActionButton = view.findViewById(R.id.fab_add);
             floatingActionButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -58,11 +73,9 @@ public class HomeFragment extends Fragment implements OnItemListener {
     private void setRecyclerView(final Activity activity) {
         recyclerView = getView().findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
-        List<CardItem> list = new ArrayList<>();
-        list.add(new CardItem("ic_launcher_foreground", "Place", "Date", "Description"));
-        list.add(new CardItem("ic_launcher_foreground", "Place", "Date", "Description"));
+        
         final OnItemListener listener = this;
-        cardAdapter = new CardAdapter(list, activity, listener);
+        cardAdapter = new CardAdapter(activity, listener);
         recyclerView.setAdapter(cardAdapter);
     }
 
@@ -70,6 +83,7 @@ public class HomeFragment extends Fragment implements OnItemListener {
     public void onItemClick(int position) {
         AppCompatActivity appCompatActivity = (AppCompatActivity) getActivity();
         if(appCompatActivity != null) {
+            listViewModel.select(listViewModel.getCardItem(position));
             Utilities.insertFragment(appCompatActivity, new DetailsFragment(), DetailsFragment.class.getSimpleName());
         }
     }
