@@ -8,6 +8,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.progetto.CardItem;
+import com.example.progetto.Database.CardItemRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,10 +17,12 @@ public class ListViewModel extends AndroidViewModel {
 
     private final MutableLiveData<CardItem> itemSelected = new MutableLiveData<>();
 
-    private MutableLiveData<List<CardItem>> cardItems;
+    private LiveData<List<CardItem>> cardItems;
 
     public ListViewModel(@NonNull Application application) {
         super(application);
+        CardItemRepository repository = new CardItemRepository(application);
+        cardItems = repository.getCardItemList();
     }
 
     public void select(CardItem item) {
@@ -31,26 +34,7 @@ public class ListViewModel extends AndroidViewModel {
     }
 
     public LiveData<List<CardItem>> getCardItems() {
-        if(cardItems == null) {
-            cardItems = new MutableLiveData<>();
-            loadItems();
-        }
         return cardItems;
-    }
-
-    private void loadItems() {
-        addCardItem(new CardItem("ic_launcher_foreground", "Place1", "Date", "Description1"));
-        addCardItem(new CardItem("ic_launcher_foreground", "Place2", "Date", "Description2"));
-    }
-
-    public void addCardItem(CardItem item) {
-        List<CardItem> list = new ArrayList<>();
-        list.add(item);
-
-        if(cardItems.getValue() != null) {
-            list.addAll(cardItems.getValue());
-        }
-        cardItems.setValue(list);
     }
 
     public CardItem getCardItem (int position) {

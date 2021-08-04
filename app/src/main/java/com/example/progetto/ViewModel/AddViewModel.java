@@ -11,18 +11,21 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.progetto.CardItem;
+import com.example.progetto.Database.CardItemRepository;
 import com.example.progetto.R;
 import com.example.progetto.Utilities;
 
 public class AddViewModel extends AndroidViewModel {
 
+    private CardItemRepository repository;
+
     private final MutableLiveData<Bitmap> imageBitmap = new MutableLiveData<>();
-    private final  Application application;
 
     public AddViewModel(@NonNull Application application) {
         super(application);
-        this.application = application;
-        initializeBitmap();
+
+        repository = new CardItemRepository(application);
     }
 
     public void setImageBitmap(Bitmap bitmap) {
@@ -33,10 +36,7 @@ public class AddViewModel extends AndroidViewModel {
         return imageBitmap;
     }
 
-    public void initializeBitmap() {
-        Drawable drawable = ResourcesCompat.getDrawable(application.getResources(), R.drawable.ic_launcher_foreground, application.getTheme());
-        Bitmap bitmap = Utilities.drawableToBitmap(drawable);
-
-        imageBitmap.setValue(bitmap);
+    public void addCardItem(CardItem cardItem) {
+        repository.addCardItem(cardItem);
     }
 }

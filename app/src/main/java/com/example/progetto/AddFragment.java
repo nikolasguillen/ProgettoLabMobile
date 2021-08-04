@@ -25,6 +25,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelStoreOwner;
 
 import com.example.progetto.ViewModel.AddViewModel;
+import com.google.android.material.textfield.TextInputEditText;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -36,6 +37,10 @@ import java.util.Locale;
 import static com.example.progetto.Utilities.REQUEST_IMAGE_CAPTURE;
 
 public class AddFragment extends Fragment {
+
+    private TextInputEditText placeTextInput;
+    private TextInputEditText descriptionTestInput;
+    private TextInputEditText dateTextInput;
 
     @Nullable
     @Override
@@ -50,6 +55,10 @@ public class AddFragment extends Fragment {
         final Activity activity = getActivity();
         if (activity != null) {
             Utilities.setupToolbar((AppCompatActivity) activity, "Add travel");
+
+            placeTextInput = view.findViewById(R.id.placeTextInputEditText);
+            descriptionTestInput = view.findViewById(R.id.descriptionTextInputEditText);
+            dateTextInput = view.findViewById(R.id.dateTextInputEditText);
 
             view.findViewById(R.id.captureButton).setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -75,14 +84,26 @@ public class AddFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
                     Bitmap bitmap = addViewModel.getBitmap().getValue();
+                    String imageUriString;
                     if(bitmap != null) {
                         try {
-                            saveImage(bitmap, activity);
-                            Toast.makeText(activity, "Image Saved", Toast.LENGTH_SHORT).show();
+                            imageUriString = String.valueOf(saveImage(bitmap, activity));
+                            /*Toast.makeText(activity, "Image Saved", Toast.LENGTH_SHORT).show();*/
                         } catch (IOException e) {
                             e.printStackTrace();
+                            imageUriString = "ic_launcher_foreground";
                         }
+                    } else {
+                        imageUriString = "ic_launcher_foreground";
                     }
+
+                    addViewModel.addCardItem(new CardItem(imageUriString,
+                            placeTextInput.getText().toString(),
+                            descriptionTestInput.getText().toString(),
+                            dateTextInput.getText().toString()));
+
+                    addViewModel.setImageBitmap(null);
+                    ((AppCompatActivity) activity).getSupportFragmentManager().popBackStack();
                 }
             });
         }
@@ -100,7 +121,7 @@ public class AddFragment extends Fragment {
         menu.findItem(R.id.app_bar_search).setVisible(false);
     }
 
-    private void saveImage(Bitmap bitmap, Activity activity) throws IOException {
+    private Uri saveImage(Bitmap bitmap, Activity activity) throws IOException {
         String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.ITALY).format(new Date());
         String name = "JPEG_" + timestamp + "_.jpeg";
 
@@ -115,5 +136,7 @@ public class AddFragment extends Fragment {
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
 
         outputStream.close();
+
+        return imageUri;
     }
 }

@@ -2,7 +2,10 @@ package com.example.progetto;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -69,6 +72,12 @@ public class DetailsFragment extends Fragment {
                     if(image_path.contains("ic_")) {
                         Drawable drawable = ContextCompat.getDrawable(activity, activity.getResources().getIdentifier(image_path, "drawable", activity.getPackageName()));
                         placeImageView.setImageDrawable(drawable);
+                    } else {
+                        Bitmap bitmap = Utilities.getImageBitmap(activity, Uri.parse(image_path));
+                        if (bitmap != null) {
+                            placeImageView.setImageBitmap(bitmap);
+                            placeImageView.setBackgroundColor(Color.WHITE);
+                        }
                     }
                 }
             });

@@ -23,7 +23,8 @@
             android:background="@color/purple_500"
             android:contentDescription="@string/image_of_the_place"
             tools:srcCompat="@tools:sample/backgrounds/scenic"
-            android:scaleType="centerCrop" />
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_launcher_foreground" />
 
         <TextView
             android:layout_width="match_parent"

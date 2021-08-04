@@ -1,7 +1,9 @@
 package com.example.progetto.RecyclerView;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,13 +15,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.progetto.CardItem;
 import com.example.progetto.R;
+import com.example.progetto.Utilities;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class CardAdapter extends RecyclerView.Adapter<CardViewHolder> {
 
-    private List<CardItem> cardItemList;
+    private List<CardItem> cardItemList = new ArrayList<>();
     private Activity activity;
     private OnItemListener listener;
 
@@ -45,6 +48,11 @@ public class CardAdapter extends RecyclerView.Adapter<CardViewHolder> {
                     .getIdentifier(image_path, "drawable",
                             activity.getPackageName()));
             holder.imageCardView.setImageDrawable(drawable);
+        } else {
+            Bitmap bitmap = Utilities.getImageBitmap(activity, Uri.parse(image_path));
+            if(bitmap != null) {
+                holder.imageCardView.setImageBitmap(bitmap);
+            }
         }
 
         holder.placeTextView.setText(currentCardItem.getPlace());
